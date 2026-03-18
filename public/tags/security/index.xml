@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Security on julio</title>
+    <link>http://localhost:1313/tags/security/</link>
+    <description>Recent content in Security on julio</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/security/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>sekia.ai</title>
+      <link>http://localhost:1313/posts/sekia/</link>
+      <pubDate>Wed, 18 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/sekia/</guid>
+      <description>I built sekia, an open-source multi-agent event bus for security automation. Here&amp;rsquo;s what it does and the three workflows that have had the biggest impact on my day-to-day work.</description>
+    </item>
+  </channel>
+</rss>

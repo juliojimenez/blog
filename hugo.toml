@@ -1,0 +1,24 @@
+baseURL = 'https://julio.sh/'
+languageCode = 'en-us'
+title = 'julio'
+theme = 'PaperMod'
+
+[params]
+defaultTheme = 'dark'
+ShowReadingTime = true
+ShowCodeCopyButtons = true
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+
+  [params.homeInfoParams]
+  Title = "julio"
+  Content = "programming • security • technology"
+
+[markup]
+  [markup.highlight]
+  style = 'monokai'
+  lineNos = false
+  guessSyntax = true
+
+[outputs]
+home = ['HTML', 'RSS']

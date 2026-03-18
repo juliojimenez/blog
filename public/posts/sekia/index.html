@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="dark">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>sekia.ai | julio</title>
+<meta name="keywords" content="sekia, security, automation, go">
+<meta name="description" content="I built sekia, an open-source multi-agent event bus for security automation. Here&rsquo;s what it does and the three workflows that have had the biggest impact on my day-to-day work.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/sekia/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.da3211e5ef867bf2b75fd5a6515cfed7195c011e8ab735694e203810a827097b.css" integrity="sha256-2jIR5e&#43;Ge/K3X9WmUVz&#43;1xlcAR6KtzVpTiA4EKgnCXs=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/sekia/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="julio (Alt + H)">julio</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      sekia.ai
+    </h1>
+    <div class="post-meta"><span title='2026-03-18 00:00:00 +0000 UTC'>March 18, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+<figure class="entry-cover">
+        <img loading="eager" src="http://localhost:1313/images/sekia-logo.png" alt="sekia logo">
+        
+</figure>
+  <div class="post-content"><p>I spend my days leading cloud infrastructure security across AWS, GCP, and Azure. That means a constant stream of alerts, access requests, vulnerability findings, and cross-platform noise that demands attention. Most of it is repetitive. Most of it follows patterns. And most of it was eating hours I should have been spending on actual security engineering.</p>
+<p>So I built <a href="https://sekia.ai">sekia</a>, an open-source multi-agent event bus that connects the tools I already use and lets me automate workflows with Lua scripts and built-in AI. It ties together GitHub, Slack, Linear, Gmail, and Google Calendar over an embedded NATS message bus. Seven small Go binaries, zero external dependencies, one <code>brew install</code> to get started.</p>
+<p>This post covers what sekia does, how it handles security, and the three workflows that have had the biggest impact on my day-to-day work.</p>
+<h2 id="what-sekia-actually-is">What sekia Actually Is<a hidden class="anchor" aria-hidden="true" href="#what-sekia-actually-is">#</a></h2>
+<p>sekia is a daemon (<code>sekiad</code>) with an embedded NATS server and JetStream for durable messaging. Lightweight agents (<code>sekia-github</code>, <code>sekia-slack</code>, <code>sekia-linear</code>, <code>sekia-google</code>) connect to the bus, publish events from external services, and execute commands dispatched by Lua workflows. A CLI (<code>sekiactl</code>) and an optional MCP server (<code>sekia-mcp</code>) round things out.</p>
+<p>The architecture is simple: agents emit events, Lua scripts react to them, and scripts can send commands back to any connected agent. Everything flows through NATS subjects like <code>sekia.events.github</code> or <code>sekia.commands.slack-agent</code>. Agents heartbeat every 30 seconds, auto-register on connect, and support named instances for multi-tenancy.</p>
+<p>The Lua API is intentionally small. <code>sekia.on()</code> subscribes to event patterns. <code>sekia.command()</code> talks to agents. <code>sekia.ai()</code> and <code>sekia.ai_json()</code> call an LLM (Claude by default) directly from your workflow. <code>sekia.schedule()</code> runs handlers on a timer for autonomous agent behavior. <code>sekia.conversation()</code> gives you multi-turn state for threaded interactions. That&rsquo;s the whole surface area, and it covers a surprising amount of ground.</p>
+<p>Workflows live in <code>~/.config/sekia/workflows/</code> as plain <code>.lua</code> files. Hot-reload is on by default, so editing a file picks up changes immediately. No deploys, no containers, no CI pipeline for a config change.</p>
+<h2 id="security-by-design">Security by Design<a hidden class="anchor" aria-hidden="true" href="#security-by-design">#</a></h2>
+<p>I built sekia with the same mindset I bring to production infrastructure. Secrets never sit in plaintext configs. sekia supports three encryption backends that can be mixed in the same TOML file: <code>ENC[...]</code> for local age keypair encryption, <code>KMS[...]</code> for AWS KMS, and <code>ASM[...]</code> for AWS Secrets Manager. You pick the backend that fits your threat model. Age keys can live off-machine via <code>SEKIA_AGE_KEY</code> or <code>SEKIA_AGE_KEY_FILE</code>. AWS backends use the standard SDK credential chain.</p>
+<p>Lua workflows run in a sandboxed VM. Only <code>base</code>, <code>table</code>, <code>string</code>, and <code>math</code> are available. No <code>os</code>, no <code>io</code>, no <code>debug</code>, no <code>dofile</code>, no <code>load</code>. A workflow cannot touch the filesystem or execute arbitrary commands on the host.</p>
+<p>For supply-chain integrity, sekia supports workflow verification. Enable <code>workflows.verify_integrity</code> and each <code>.lua</code> file is checked against a SHA256 manifest before loading. <code>sekiactl workflows sign</code> generates the manifest. Tampered or unsigned workflows do not execute. When hot-reload is active, updating the manifest triggers a full reload.</p>
+<p>The web dashboard (htmx + SSE, embedded in the binary) ships with <code>Content-Security-Policy</code>, <code>X-Frame-Options</code>, <code>X-Content-Type-Options</code>, and <code>Strict-Transport-Security</code> headers on every response. SSE connections are capped at 50 to prevent resource exhaustion. All state-changing requests require CSRF protection via double-submit cookie.</p>
+<p>The NATS bus listens on <code>127.0.0.1:7600</code> by default and the HTTP API runs over a Unix socket. Nothing is exposed to the network unless you explicitly configure it.</p>
+<h2 id="workflow-1-auto-remediating-security-operations-issues">Workflow 1: Auto-Remediating Security Operations Issues<a hidden class="anchor" aria-hidden="true" href="#workflow-1-auto-remediating-security-operations-issues">#</a></h2>
+<p>The workflow that saves me the most time handles the triage and remediation loop for security findings. Vulnerability scanners like Wiz generate a constant stream of issues that land in our secops repo. Most follow well-known patterns: a misconfigured S3 bucket policy, an overly permissive IAM role, an unencrypted resource.</p>
+<p>With sekia, I have a scheduled workflow that periodically reviews open issues, classifies them with <code>sekia.ai_json()</code>, and takes action based on severity and type. For findings that match known remediation patterns, the workflow opens a PR with the Terraform fix directly. For everything else, it triages into the right priority bucket in Linear and pings the on-call channel in Slack.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-lua" data-lang="lua"><span style="display:flex;"><span>sekia.schedule(<span style="color:#ae81ff">300</span>, <span style="color:#66d9ef">function</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">local</span> result, err <span style="color:#f92672">=</span> sekia.ai_json(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Review these security findings and classify each by severity &#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;and whether auto-remediation is possible:</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">..</span> findings,
+</span></span><span style="display:flex;"><span>        { system <span style="color:#f92672">=</span> sekia.skill(<span style="color:#e6db74">&#34;secops-triage&#34;</span>) }
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> err <span style="color:#66d9ef">then</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _, finding <span style="color:#66d9ef">in</span> ipairs(result.findings <span style="color:#f92672">or</span> {}) <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> finding.auto_remediate <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>            sekia.command(<span style="color:#e6db74">&#34;github-agent&#34;</span>, <span style="color:#e6db74">&#34;create_comment&#34;</span>, {
+</span></span><span style="display:flex;"><span>                owner <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;myorg&#34;</span>, repo <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;secops&#34;</span>,
+</span></span><span style="display:flex;"><span>                number <span style="color:#f92672">=</span> finding.issue_number,
+</span></span><span style="display:flex;"><span>                body <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Auto-remediation PR opened. Review and merge.&#34;</span>,
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>            sekia.command(<span style="color:#e6db74">&#34;linear-agent&#34;</span>, <span style="color:#e6db74">&#34;create_issue&#34;</span>, {
+</span></span><span style="display:flex;"><span>                team_id <span style="color:#f92672">=</span> SECURITY_TEAM_ID,
+</span></span><span style="display:flex;"><span>                title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;[&#34;</span> <span style="color:#f92672">..</span> finding.severity <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;] &#34;</span> <span style="color:#f92672">..</span> finding.title,
+</span></span><span style="display:flex;"><span>                description <span style="color:#f92672">=</span> finding.summary <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">GitHub: &#34;</span> <span style="color:#f92672">..</span> finding.url,
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>)
+</span></span></code></pre></div><p>The key here is the skill system. The <code>secops-triage</code> skill is a markdown file that encodes my team&rsquo;s remediation playbook: what constitutes auto-remediatable, what the Terraform patterns look like, and how to prioritize. The AI does not freelance. It follows documented procedures.</p>
+<h2 id="workflow-2-cleaning-up-my-gmail-inbox">Workflow 2: Cleaning Up My Gmail Inbox<a hidden class="anchor" aria-hidden="true" href="#workflow-2-cleaning-up-my-gmail-inbox">#</a></h2>
+<p>Email is a tax on security engineers. Vendor alerts, compliance notifications, access request confirmations, certificate expiry warnings. Important signal buried under noise.</p>
+<p>The Google agent polls Gmail and publishes <code>gmail.message.received</code> events. My cleanup workflow uses AI to classify each message into one of a few buckets: actionable (keep in inbox), informational (archive with a label), or noise (archive immediately). Actionable messages that relate to security operations get forwarded to the appropriate Slack channel as well.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-lua" data-lang="lua"><span style="display:flex;"><span>sekia.on(<span style="color:#e6db74">&#34;sekia.events.google&#34;</span>, <span style="color:#66d9ef">function</span>(event)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> event.type <span style="color:#f92672">~=</span> <span style="color:#e6db74">&#34;gmail.message.received&#34;</span> <span style="color:#66d9ef">then</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">local</span> result, err <span style="color:#f92672">=</span> sekia.ai_json(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Classify this email. Respond with action and reason.</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;From: &#34;</span> <span style="color:#f92672">..</span> event.payload.from <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;Subject: &#34;</span> <span style="color:#f92672">..</span> event.payload.subject <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;Body: &#34;</span> <span style="color:#f92672">..</span> event.payload.body,
+</span></span><span style="display:flex;"><span>        { system <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Classify as: actionable, informational, or noise. &#34;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;If security-related and actionable, set security=true.&#34;</span> }
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> err <span style="color:#66d9ef">then</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> result.action <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;noise&#34;</span> <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>        sekia.command(<span style="color:#e6db74">&#34;google-agent&#34;</span>, <span style="color:#e6db74">&#34;archive&#34;</span>, {
+</span></span><span style="display:flex;"><span>            message_id <span style="color:#f92672">=</span> event.payload.id,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elseif</span> result.action <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;informational&#34;</span> <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>        sekia.command(<span style="color:#e6db74">&#34;google-agent&#34;</span>, <span style="color:#e6db74">&#34;add_label&#34;</span>, {
+</span></span><span style="display:flex;"><span>            message_id <span style="color:#f92672">=</span> event.payload.id, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;auto/informational&#34;</span>,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>        sekia.command(<span style="color:#e6db74">&#34;google-agent&#34;</span>, <span style="color:#e6db74">&#34;archive&#34;</span>, {
+</span></span><span style="display:flex;"><span>            message_id <span style="color:#f92672">=</span> event.payload.id,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> result.security <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>        sekia.command(<span style="color:#e6db74">&#34;slack-agent&#34;</span>, <span style="color:#e6db74">&#34;send_message&#34;</span>, {
+</span></span><span style="display:flex;"><span>            channel <span style="color:#f92672">=</span> C_SECURITY,
+</span></span><span style="display:flex;"><span>            text <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Flagged email from &#34;</span> <span style="color:#f92672">..</span> event.payload.from
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;: &#34;</span> <span style="color:#f92672">..</span> event.payload.subject,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>)
+</span></span></code></pre></div><p>In a typical week this archives 60-70% of my incoming mail automatically and surfaces the security-relevant messages where I actually see them.</p>
+<h2 id="workflow-3-daily-email-summaries-to-slack">Workflow 3: Daily Email Summaries to Slack<a hidden class="anchor" aria-hidden="true" href="#workflow-3-daily-email-summaries-to-slack">#</a></h2>
+<p>The third workflow ties things together. Every morning at 8am, a scheduled handler scans the last 24 hours of Gmail activity, builds a digest with AI, and posts it to my Slack DM. No more opening Gmail to figure out what happened overnight.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-lua" data-lang="lua"><span style="display:flex;"><span>sekia.schedule(<span style="color:#ae81ff">86400</span>, <span style="color:#66d9ef">function</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">local</span> conv <span style="color:#f92672">=</span> sekia.conversation(<span style="color:#e6db74">&#34;internal&#34;</span>, <span style="color:#e6db74">&#34;daily-digest&#34;</span>, <span style="color:#e6db74">&#34;singleton&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">local</span> summary, err <span style="color:#f92672">=</span> conv:reply(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Summarize the key emails from the last 24 hours. &#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;Group by: security alerts, access requests, vendor updates, &#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">..</span> <span style="color:#e6db74">&#34;and everything else. Keep it concise.&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> err <span style="color:#66d9ef">then</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    sekia.command(<span style="color:#e6db74">&#34;slack-agent&#34;</span>, <span style="color:#e6db74">&#34;send_message&#34;</span>, {
+</span></span><span style="display:flex;"><span>        channel <span style="color:#f92672">=</span> MY_DM_CHANNEL,
+</span></span><span style="display:flex;"><span>        text <span style="color:#f92672">=</span> summary,
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>)
+</span></span></code></pre></div><p>The conversation API here is a nice touch. Because it maintains multi-turn state, I can follow up in Slack (via the <code>slack.mention</code> event) and ask clarifying questions about specific emails. The context carries over.</p>
+<h2 id="getting-started">Getting Started<a hidden class="anchor" aria-hidden="true" href="#getting-started">#</a></h2>
+<p>sekia installs in one line:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>brew install sekia-ai/tap/sekia
+</span></span></code></pre></div><p>Then install whichever agents you need, set your tokens as environment variables, drop a <code>.lua</code> file in the workflows directory, and run <code>sekiad</code>. The <a href="https://sekia.ai/docs/">documentation</a> walks through setup for each agent.</p>
+<p>The project is Apache 2.0 licensed and on <a href="https://github.com/sekia-ai/sekia">GitHub</a>. Contributions, feedback, and workflow ideas are welcome. If you work in security and you are tired of context-switching between six different tools to do the same repetitive tasks, give sekia a look.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/sekia/">Sekia</a></li>
+      <li><a href="http://localhost:1313/tags/security/">Security</a></li>
+      <li><a href="http://localhost:1313/tags/automation/">Automation</a></li>
+      <li><a href="http://localhost:1313/tags/go/">Go</a></li>
+    </ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">julio</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
