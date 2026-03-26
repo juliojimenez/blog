@@ -6,8 +6,15 @@
     <description>Recent content in Posts on julio</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 18 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 26 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>hash</title>
+      <link>http://localhost:1313/posts/hash/</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/hash/</guid>
+      <description>I built hash, a POSIX-compliant shell with modern features baked in. Syntax highlighting, autosuggestions, Git-aware prompts — no plugins required.</description>
+    </item>
     <item>
       <title>sekia.ai</title>
       <link>http://localhost:1313/posts/sekia/</link>
