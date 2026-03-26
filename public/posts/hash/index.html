@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="dark">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>hash | julio</title>
+<meta name="keywords" content="hash, shell, cli, c">
+<meta name="description" content="I built hash, a POSIX-compliant shell with modern features baked in. Syntax highlighting, autosuggestions, Git-aware prompts — no plugins required.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/hash/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.da3211e5ef867bf2b75fd5a6515cfed7195c011e8ab735694e203810a827097b.css" integrity="sha256-2jIR5e&#43;Ge/K3X9WmUVz&#43;1xlcAR6KtzVpTiA4EKgnCXs=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/hash/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="julio (Alt + H)">julio</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      hash
+    </h1>
+    <div class="post-meta"><span title='2026-03-26 00:00:00 +0000 UTC'>March 26, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+</div>
+  </header> 
+<figure class="entry-cover">
+        <img loading="eager" src="http://localhost:1313/images/hash-logo.png" alt="hash logo">
+        
+</figure>
+  <div class="post-content"><p>Every shell makes you choose. Bash is everywhere but feels stuck in 1989. Zsh gets you modern features if you install a plugin manager, a framework, a theme, and then wait for your prompt to load. Fish gives you everything out of the box but breaks POSIX compatibility, so half your scripts and muscle memory stop working. Nushell reimagines everything from scratch, which is exciting until you need to run a <code>for</code> loop the way you&rsquo;ve done it for twenty years.</p>
+<p>I wanted a shell that didn&rsquo;t make me choose. So I built <a href="https://hash-shell.org">hash</a>.</p>
+<p>hash is a POSIX-compliant command line interpreter written in C. It runs on Linux, macOS, and FreeBSD. It ships with syntax highlighting, autosuggestions, tab completion, persistent history, and Git-aware prompts — all built in, no plugins, no frameworks, no configuration rabbit holes. One install, and it works.</p>
+<h2 id="what-you-get-out-of-the-box">What You Get Out of the Box<a hidden class="anchor" aria-hidden="true" href="#what-you-get-out-of-the-box">#</a></h2>
+<p><strong>Syntax highlighting</strong> as you type. Commands, arguments, and operators are colored in real time so you catch typos before hitting enter.</p>
+<p><strong>Autosuggestions</strong> pulled from your history. Start typing and hash shows a dimmed completion inline. Accept it, ignore it, keep typing. It&rsquo;s the fish feature people love most, and it&rsquo;s here without leaving POSIX behind.</p>
+<p><strong>Git-aware prompts</strong> via a single <code>\g</code> escape in your <code>PS1</code>. It shows the current branch and status indicators — no shell functions to maintain, no plugin to configure. Just add <code>\g</code> to your prompt string and it works.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PS1<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;\e[\u@\h \W\g]\$ &#39;</span>
+</span></span></code></pre></div><p>That gives you a color-coded prompt with username, hostname, working directory, Git branch with status, and a <code>$</code>/<code>#</code> indicator. The <code>\e</code> escape even changes color based on the exit code of your last command — green for success, red for failure.</p>
+<p><strong>Tab completion</strong> for commands, files, and directories. First press completes the common prefix. Second press shows all matches. Directory completions include trailing slashes so you can keep tabbing deeper.</p>
+<p><strong>Persistent history</strong> across sessions with all the controls you&rsquo;d expect: <code>!!</code> to repeat the last command, <code>!n</code> by number, <code>!prefix</code> for pattern matching. History size is configurable via <code>HISTSIZE</code> and <code>HISTFILESIZE</code>. And if you prefix a command with a space, it never gets saved — useful when you&rsquo;re passing secrets on the command line and don&rsquo;t want them sitting in <code>~/.hash_history</code>.</p>
+<p><strong>Full job control</strong>: background processes with <code>&amp;</code>, <code>jobs</code> to list them, <code>fg</code> and <code>bg</code> to manage them, <code>kill</code> to stop them.</p>
+<h2 id="posix-compliance-not-posix-only">POSIX Compliance, Not POSIX Only<a hidden class="anchor" aria-hidden="true" href="#posix-compliance-not-posix-only">#</a></h2>
+<p>hash follows the POSIX standard. Your existing scripts work. Your <code>if/then/else</code>, <code>for</code>, <code>while</code>, <code>case</code> statements all work. Variable expansion, command substitution with <code>$()</code>, pipes, redirects (<code>&gt;</code>, <code>&gt;&gt;</code>, <code>&lt;</code>, <code>2&gt;</code>, <code>&amp;&gt;</code>), logical operators (<code>&amp;&amp;</code>, <code>||</code>) — all of it works the way you expect.</p>
+<p>But POSIX compliance doesn&rsquo;t mean POSIX limitations. hash layers modern interactive features on top of a standards-compliant foundation. You get the portability of POSIX with the experience of a next-generation shell.</p>
+<p>Functions, aliases, and builtins like <code>cd</code>, <code>export</code>, <code>source</code>, <code>test</code>, <code>echo</code>, <code>alias</code>, and <code>history</code> are all here. The scripting surface area covers variables (<code>$?</code>, <code>$$</code>, <code>$0</code>–<code>$9</code>, <code>$#</code>, <code>$@</code>, <code>$*</code>), arithmetic expansion, and the <code>[</code> test command with file, string, and numeric operators.</p>
+<h2 id="simple-configuration">Simple Configuration<a hidden class="anchor" aria-hidden="true" href="#simple-configuration">#</a></h2>
+<p>Three files. That&rsquo;s it.</p>
+<ul>
+<li><strong><code>~/.hashrc</code></strong> — interactive settings, aliases, prompt customization</li>
+<li><strong><code>~/.hash_profile</code></strong> — login shell environment setup</li>
+<li><strong><code>~/.hash_logout</code></strong> — runs on login shell exit</li>
+</ul>
+<p>No <code>.zshrc</code> that sources a framework that sources plugins that source themes. No <code>config.fish</code> with a different syntax than every other config file on your system. Just familiar dotfiles with familiar syntax.</p>
+<h2 id="how-hash-compares">How hash Compares<a hidden class="anchor" aria-hidden="true" href="#how-hash-compares">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>hash</th>
+          <th>bash</th>
+          <th>zsh</th>
+          <th>fish</th>
+          <th>nushell</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>POSIX compliant</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Mostly</td>
+          <td>No</td>
+          <td>No</td>
+      </tr>
+      <tr>
+          <td>Syntax highlighting</td>
+          <td>Built-in</td>
+          <td>Plugin</td>
+          <td>Plugin</td>
+          <td>Built-in</td>
+          <td>Built-in</td>
+      </tr>
+      <tr>
+          <td>Autosuggestions</td>
+          <td>Built-in</td>
+          <td>Plugin</td>
+          <td>Plugin</td>
+          <td>Built-in</td>
+          <td>Built-in</td>
+      </tr>
+      <tr>
+          <td>Git prompt</td>
+          <td>Built-in</td>
+          <td>Manual</td>
+          <td>Plugin</td>
+          <td>Built-in</td>
+          <td>Manual</td>
+      </tr>
+      <tr>
+          <td>Config complexity</td>
+          <td>3 files</td>
+          <td>Moderate</td>
+          <td>High</td>
+          <td>Simple</td>
+          <td>Moderate</td>
+      </tr>
+      <tr>
+          <td>Written in</td>
+          <td>C</td>
+          <td>C</td>
+          <td>C</td>
+          <td>C++/Rust</td>
+          <td>Rust</td>
+      </tr>
+  </tbody>
+</table>
+<p>The pattern is clear. Bash and zsh require third-party plugins for features that should be standard in 2026. Fish and nushell include those features but break compatibility. hash is the only shell in this list that gives you both.</p>
+<h2 id="built-for-quality">Built for Quality<a hidden class="anchor" aria-hidden="true" href="#built-for-quality">#</a></h2>
+<p>hash is compiled with <code>-Wall -Wextra -Werror</code>. The codebase is analyzed with SonarCloud, tested with Valgrind for memory safety, and runs through address and undefined behavior sanitizers. The test suite includes both unit tests (via the Unity framework) and integration tests. Fuzzing is part of the quality pipeline.</p>
+<p>String operations use bounded variants throughout — no <code>strcpy</code>, no <code>strcat</code>. Input is sanitized. The code is written with the same discipline you&rsquo;d expect from security-critical infrastructure.</p>
+<h2 id="install">Install<a hidden class="anchor" aria-hidden="true" href="#install">#</a></h2>
+<p><strong>macOS (Homebrew):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>brew install juliojimenez/hash/hash-shell
+</span></span></code></pre></div><p><strong>Debian/Ubuntu:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>echo &#34;deb [trusted=yes] https://hash-shell.org/apt/ stable main&#34; | sudo tee /etc/apt/sources.list.d/hash-shell.list
+</span></span><span style="display:flex;"><span>sudo apt update &amp;&amp; sudo apt install hash-shell
+</span></span></code></pre></div><p><strong>Docker:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>docker pull juliojimenez/hash-shell
+</span></span></code></pre></div><p><strong>From source:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>git clone https://github.com/juliojimenez/hash.git
+</span></span><span style="display:flex;"><span>cd hash
+</span></span><span style="display:flex;"><span>make
+</span></span><span style="display:flex;"><span>sudo make install
+</span></span></code></pre></div><p>Pre-compiled binaries are also available on the <a href="https://github.com/juliojimenez/hash/releases">releases page</a> for Linux (x86_64, ARM64), FreeBSD (x86_64, ARM64), and macOS (Apple Silicon).</p>
+<h2 id="try-it">Try It<a hidden class="anchor" aria-hidden="true" href="#try-it">#</a></h2>
+<p>hash is Apache 2.0 licensed and on <a href="https://github.com/juliojimenez/hash">GitHub</a>. If you&rsquo;ve been meaning to upgrade from bash but don&rsquo;t want to give up POSIX compatibility or wrestle with plugin managers, hash might be what you&rsquo;re looking for.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/hash/">Hash</a></li>
+      <li><a href="http://localhost:1313/tags/shell/">Shell</a></li>
+      <li><a href="http://localhost:1313/tags/cli/">Cli</a></li>
+      <li><a href="http://localhost:1313/tags/c/">C</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/sekia/">
+    <span class="title">Next »</span>
+    <br>
+    <span>sekia.ai</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">julio</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
