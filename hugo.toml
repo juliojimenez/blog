@@ -14,6 +14,10 @@ ShowBreadCrumbs = true
   Title = "julio"
   Content = "programming • security • technology"
 
+  # No cover images, anywhere. Posts carry no cover: block either.
+  [params.cover]
+  hidden = true
+
 [markup]
   [markup.highlight]
   style = 'monokai'

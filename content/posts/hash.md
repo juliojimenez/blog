@@ -4,10 +4,6 @@ date: 2026-03-26
 draft: false
 summary: "I built hash, a POSIX-compliant shell with modern features baked in. Syntax highlighting, autosuggestions, Git-aware prompts — no plugins required."
 tags: ["hash", "shell", "cli", "c"]
-cover:
-  image: "/images/hash-logo.png"
-  alt: "hash logo"
-  hiddenInSingle: false
 ---
 
 Every shell makes you choose. Bash is everywhere but feels stuck in 1989. Zsh gets you modern features if you install a plugin manager, a framework, a theme, and then wait for your prompt to load. Fish gives you everything out of the box but breaks POSIX compatibility, so half your scripts and muscle memory stop working. Nushell reimagines everything from scratch, which is exciting until you need to run a `for` loop the way you've done it for twenty years.

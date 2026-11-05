@@ -4,10 +4,6 @@ date: 2026-03-18
 draft: false
 summary: "I built sekia, an open-source multi-agent event bus for security automation. Here's what it does and the three workflows that have had the biggest impact on my day-to-day work."
 tags: ["sekia", "security", "automation", "go"]
-cover:
-  image: "/images/sekia-logo.png"
-  alt: "sekia logo"
-  hiddenInSingle: false
 ---
 
 I spend my days leading cloud infrastructure security across AWS, GCP, and Azure. That means a constant stream of alerts, access requests, vulnerability findings, and cross-platform noise that demands attention. Most of it is repetitive. Most of it follows patterns. And most of it was eating hours I should have been spending on actual security engineering.
