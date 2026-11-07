@@ -1,0 +1,14 @@
+/* Home page hero. homeInfoParams renders it as .first-entry.home-info, and PaperMod
+   centres the title and tagline inside a 320px-tall box (260px under 768px). At 1280px
+   wide that left 159px between the header and the hero text and 173px between the hero
+   text and the first post. Halving the box halves both gaps; the theme's margins around
+   the box (24px above, 48px below) are unchanged. */
+.first-entry.home-info {
+    min-height: 150px;
+}
+
+@media screen and (max-width: 768px) {
+    .first-entry.home-info {
+        min-height: 130px;
+    }
+}
